@@ -1,5 +1,7 @@
 package com.groupec.retrofitcleanarchictecturesampleapp.di
 
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.groupec.retrofitcleanarchictecturesampleapp.remote.common.Constants
 import com.groupec.retrofitcleanarchictecturesampleapp.remote.repository.RemoteRepository
 import com.groupec.retrofitcleanarchictecturesampleapp.remote.repository.RemoteRepositoryImpl
@@ -26,16 +28,25 @@ class NetworkModule {
             .build()
     }
 
+    // Custom my gson to format date
+    @Provides
+    @Singleton
+    fun provideGson(): Gson {
+        return GsonBuilder()
+            .setDateFormat("yyyy-MM-dd HH:mm:ss")
+            .create()
+    }
 
     @Provides
     @Singleton
     fun provideRetrofit(
-        httpClient: OkHttpClient
-    ) : Retrofit {
+        httpClient: OkHttpClient,
+        gson: Gson // Inject the custom Gson instance
+    ): Retrofit {
         return Retrofit.Builder()
             .baseUrl(Constants.BASE_URL)
             .client(httpClient)
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
     }
 
